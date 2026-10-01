@@ -15,6 +15,11 @@ To jump straight into a test situation (the ending, Rent Day, 100% Stress,
 a rainy day...), run `src/petsa/demo/ScenarioLauncher.java`. Test games use
 their own save and leaderboard files.
 
+## Credits
+
+The pixel font is Press Start 2P by CodeMan38, used under the SIL Open Font
+License 1.1 (see `src/petsa/ui/resources/PressStart2P-OFL.txt`).
+
 ## Branches
 
 - **main**: the game with all its comments, for reference and learning.
