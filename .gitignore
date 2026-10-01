@@ -1,0 +1,11 @@
+/build/
+/dist/
+/nbproject/private/
+/saves.csv
+/saves_test.csv
+/leaderboard.csv
+/leaderboard_test.csv
+/settings.properties
+*.docx
+~$*
+desktop.ini
