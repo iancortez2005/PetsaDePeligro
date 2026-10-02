@@ -15,11 +15,14 @@ import javax.swing.JLayeredPane;
 import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Image;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameApp {
@@ -31,7 +34,7 @@ public class GameApp {
     private final JFrame frame;
     private final LeaderboardManager leaderboard;
     private final SaveManager saves;
-    private final GameSettings settings = new GameSettings(Paths.get("settings.properties"));
+    private final GameSettings settings = new GameSettings(dataFile("settings.properties"));
 
     private RoomPanel activeRoom;
     private GameEngine activeEngine;
@@ -41,19 +44,51 @@ public class GameApp {
     }
 
     public GameApp() {
-        this(Paths.get("saves.csv"), Paths.get("leaderboard.csv"), "Petsa de Peligro");
+        this(dataFile("saves.csv"), dataFile("leaderboard.csv"), "Petsa de Peligro");
     }
 
     public static GameApp forTesting() {
-        return new GameApp(Paths.get("saves_test.csv"), Paths.get("leaderboard_test.csv"),
+        return new GameApp(dataFile("saves_test.csv"), dataFile("leaderboard_test.csv"),
                 "Petsa de Peligro (test scenario)");
+    }
+
+    public static Path dataFile(String name) {
+        String appData = System.getenv("APPDATA");
+        Path folder = (appData != null)
+                ? Paths.get(appData, "Petsa de Peligro")
+                : Paths.get(System.getProperty("user.home"), ".petsa-de-peligro");
+        Path file = folder.resolve(name);
+        Path oldFile = Paths.get(name).toAbsolutePath();
+        try {
+            Files.createDirectories(folder);
+            if (!Files.exists(file) && Files.exists(oldFile)) {
+                Files.copy(oldFile, file);
+            }
+        } catch (IOException e) {
+            System.err.println("GameApp: couldn't prepare " + file + " (" + e.getMessage() + ")");
+        }
+        return file;
     }
 
     private GameApp(Path saveFile, Path leaderboardFile, String title) {
         this.saves = new SaveManager(saveFile);
         this.leaderboard = new LeaderboardManager(leaderboardFile);
         this.frame = new JFrame(title);
+        setWindowIcon(frame);
         FadePane.install(frame);
+    }
+
+    private static void setWindowIcon(JFrame frame) {
+        Image icon = PixelKit.loadImage("resources/app_icon.png");
+        if (icon == null) {
+            return;
+        }
+        List<Image> sizes = new ArrayList<>();
+        for (int size : new int[] {16, 20, 24, 32, 40, 48, 64}) {
+            sizes.add(icon.getScaledInstance(size, size, Image.SCALE_SMOOTH));
+        }
+        sizes.add(icon);
+        frame.setIconImages(sizes);
     }
 
     public void start() {

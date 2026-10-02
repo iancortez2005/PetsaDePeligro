@@ -33,7 +33,6 @@ import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -160,7 +159,7 @@ public class ScenarioLauncher {
     }
 
     private void openWithTestSaves() {
-        SaveManager saves = new SaveManager(Paths.get("saves_test.csv"));
+        SaveManager saves = new SaveManager(GameApp.dataFile("saves_test.csv"));
         try {
             saves.deleteAll();
             int[][] points = {{3, 0, 4200}, {3, 1, 4130}, {7, 2, 3900}, {12, 0, 3100}, {18, 1, 2400}};
