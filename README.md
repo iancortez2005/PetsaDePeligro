@@ -7,11 +7,17 @@ NetBeans (Ant).
 
 ## Playing it
 
-Download `Petsa de Peligro-<version>.zip` from the
-[Releases](https://github.com/iancortez2005/PetsaDePeligro/releases) page,
-unzip it anywhere and double-click `Petsa de Peligro.exe`. Java comes inside
-the folder, so nothing else needs to be installed (Windows 10/11, 64-bit).
-Windows may warn that the app is from an unknown publisher: click
+From the [Releases](https://github.com/iancortez2005/PetsaDePeligro/releases)
+page (Windows 10/11, 64-bit), download either:
+
+- `PetsaDePeligro-<version>-setup.exe`: an installer with Start-menu and
+  desktop shortcuts. It installs for your user only, so it needs no admin
+  rights, and it can be removed in Settings > Apps.
+- `PetsaDePeligro-<version>-portable.zip`: no install. Unzip it anywhere
+  and double-click `Petsa de Peligro.exe`.
+
+Java comes inside both, so nothing else needs to be installed. Windows may
+warn that the app is from an unknown publisher: click
 **More info > Run anyway**.
 
 Saves, the leaderboard and settings are kept in `%APPDATA%\Petsa de Peligro`.
@@ -24,7 +30,9 @@ is set to Java 25 (the JDK that comes with NetBeans).
 
 To make the standalone version, run `tools/build-app.bat`. It packages the
 game with a trimmed copy of Java (using the JDK's jpackage) and writes the
-zip to `release/`. The app icon is `tools/app-icon.ico`.
+installer and the portable zip to `release/`. The installer also needs
+[WiX Toolset 3.14](https://github.com/wixtoolset/wix3/releases); without it,
+only the zip is made. The app icon is `tools/app-icon.ico`.
 
 To jump straight into a test situation (the ending, Rent Day, 100% Stress,
 a rainy day...), run `src/petsa/demo/ScenarioLauncher.java`. Test games use
