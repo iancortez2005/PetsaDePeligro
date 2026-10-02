@@ -5,11 +5,26 @@ pay the rent and bills, keep your Hunger, Stress, Sickness and Academics
 in check, and save enough for the trip home. Java Swing, built with
 NetBeans (Ant).
 
-## Running it
+## Playing it
+
+Download `Petsa de Peligro-<version>.zip` from the
+[Releases](https://github.com/iancortez2005/Petsa-de-Peligro/releases) page,
+unzip it anywhere and double-click `Petsa de Peligro.exe`. Java comes inside
+the folder, so nothing else needs to be installed (Windows 10/11, 64-bit).
+Windows may warn that the app is from an unknown publisher: click
+**More info > Run anyway**.
+
+Saves, the leaderboard and settings are kept in `%APPDATA%\Petsa de Peligro`.
+
+## Running it from the source
 
 Open the folder as a project in NetBeans and press Run, or build the jar
 with Clean and Build and run `java -jar dist/PetsaDePeligro2.jar`. The project
 is set to Java 25 (the JDK that comes with NetBeans).
+
+To make the standalone version, run `tools/build-app.bat`. It packages the
+game with a trimmed copy of Java (using the JDK's jpackage) and writes the
+zip to `release/`. The app icon is `tools/app-icon.ico`.
 
 To jump straight into a test situation (the ending, Rent Day, 100% Stress,
 a rainy day...), run `src/petsa/demo/ScenarioLauncher.java`. Test games use

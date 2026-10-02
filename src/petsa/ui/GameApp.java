@@ -15,11 +15,14 @@ import javax.swing.JLayeredPane;
 import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Image;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,6 +40,9 @@ import java.util.List;
  *
  * Saving: SAVE & EXIT on the pause screen, or closing the window mid-game,
  * writes a checkpoint for the current day and time of day to saves.csv.
+ * The game's files live in a folder of the player's own (see dataFile()),
+ * so they can be written even when the game is installed somewhere
+ * read-only like Program Files.
  * Loading: Load Game lists every saved day, then that day's saved times.
  * All checkpoints belong to one month, so starting a New Game while saves
  * exist asks first, then erases them.
@@ -52,7 +58,7 @@ public class GameApp {
     private final JFrame frame;
     private final LeaderboardManager leaderboard;
     private final SaveManager saves;
-    private final GameSettings settings = new GameSettings(Paths.get("settings.properties"));
+    private final GameSettings settings = new GameSettings(dataFile("settings.properties"));
 
     // The game in progress, while the player is in the room or reading an End of Day summary; null otherwise.
     private RoomPanel activeRoom;
@@ -63,7 +69,7 @@ public class GameApp {
     }
 
     public GameApp() {
-        this(Paths.get("saves.csv"), Paths.get("leaderboard.csv"), "Petsa de Peligro");
+        this(dataFile("saves.csv"), dataFile("leaderboard.csv"), "Petsa de Peligro");
     }
 
     /**
@@ -72,15 +78,55 @@ public class GameApp {
      * touched while testing.
      */
     public static GameApp forTesting() {
-        return new GameApp(Paths.get("saves_test.csv"), Paths.get("leaderboard_test.csv"),
+        return new GameApp(dataFile("saves_test.csv"), dataFile("leaderboard_test.csv"),
                 "Petsa de Peligro (test scenario)");
+    }
+
+    /**
+     * Where the game keeps one of its files (saves, leaderboard, settings):
+     * "%APPDATA%\Petsa de Peligro" on Windows, "~/.petsa-de-peligro"
+     * elsewhere. Older versions kept these files in the folder the game was
+     * started from; if one is found there and not yet in the new folder, it
+     * is copied over once, so saves and scores carry across.
+     */
+    public static Path dataFile(String name) {
+        String appData = System.getenv("APPDATA");
+        Path folder = (appData != null)
+                ? Paths.get(appData, "Petsa de Peligro")
+                : Paths.get(System.getProperty("user.home"), ".petsa-de-peligro");
+        Path file = folder.resolve(name);
+        Path oldFile = Paths.get(name).toAbsolutePath();
+        try {
+            Files.createDirectories(folder);
+            if (!Files.exists(file) && Files.exists(oldFile)) {
+                Files.copy(oldFile, file);
+            }
+        } catch (IOException e) {
+            System.err.println("GameApp: couldn't prepare " + file + " (" + e.getMessage() + ")");
+        }
+        return file;
     }
 
     private GameApp(Path saveFile, Path leaderboardFile, String title) {
         this.saves = new SaveManager(saveFile);
         this.leaderboard = new LeaderboardManager(leaderboardFile);
         this.frame = new JFrame(title);
+        setWindowIcon(frame);
         FadePane.install(frame);
+    }
+
+    /** The wallet icon on the title bar, taskbar and Alt+Tab, at the sizes Windows asks for. */
+    private static void setWindowIcon(JFrame frame) {
+        Image icon = PixelKit.loadImage("resources/app_icon.png");
+        if (icon == null) {
+            return;
+        }
+        List<Image> sizes = new ArrayList<>();
+        for (int size : new int[] {16, 20, 24, 32, 40, 48, 64}) {
+            sizes.add(icon.getScaledInstance(size, size, Image.SCALE_SMOOTH));
+        }
+        sizes.add(icon);
+        frame.setIconImages(sizes);
     }
 
     /** Opens the window on the Main Menu. */

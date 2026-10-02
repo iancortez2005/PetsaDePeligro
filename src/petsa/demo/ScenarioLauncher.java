@@ -33,7 +33,6 @@ import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -47,9 +46,10 @@ import java.util.function.Supplier;
  * right-click it > Run File), pick a scenario, and the real game opens
  * right there.
  *
- * Test games use their own files - saves_test.csv and leaderboard_test.csv
- * - so the real saves and leaderboard are never touched (the Settings
- * screen still uses the real settings.properties).
+ * Test games use their own files - saves_test.csv and leaderboard_test.csv,
+ * in the game's data folder (see GameApp.dataFile()) - so the real saves
+ * and leaderboard are never touched (the Settings screen still uses the
+ * real settings.properties).
  *
  * The two AUTO-PLAY scenarios let the computer play a whole month badly,
  * then show a report of what went wrong and open the game where it ended:
@@ -183,7 +183,7 @@ public class ScenarioLauncher {
 
     /** Fills saves_test.csv with a few checkpoints, then opens the main menu - try LOAD GAME. */
     private void openWithTestSaves() {
-        SaveManager saves = new SaveManager(Paths.get("saves_test.csv"));
+        SaveManager saves = new SaveManager(GameApp.dataFile("saves_test.csv"));
         try {
             saves.deleteAll();
             int[][] points = {{3, 0, 4200}, {3, 1, 4130}, {7, 2, 3900}, {12, 0, 3100}, {18, 1, 2400}};

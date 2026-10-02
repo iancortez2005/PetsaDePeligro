@@ -9,3 +9,4 @@
 *.docx
 ~$*
 desktop.ini
+/release/
