@@ -8,7 +8,7 @@ NetBeans (Ant).
 ## Playing it
 
 Download `Petsa de Peligro-<version>.zip` from the
-[Releases](https://github.com/iancortez2005/Petsa-de-Peligro/releases) page,
+[Releases](https://github.com/iancortez2005/PetsaDePeligro/releases) page,
 unzip it anywhere and double-click `Petsa de Peligro.exe`. Java comes inside
 the folder, so nothing else needs to be installed (Windows 10/11, 64-bit).
 Windows may warn that the app is from an unknown publisher: click
