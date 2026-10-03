@@ -99,7 +99,13 @@ public class StripComments {
                     .collect(Collectors.toList());
         }
         for (Path p : old) {
-            Files.delete(p);
+            if (Files.isDirectory(p)) {
+                // a folder open in NetBeans or Explorer can't be deleted on Windows;
+                // it is emptied anyway and reused when the files are written back
+                p.toFile().delete();
+            } else {
+                Files.delete(p);
+            }
         }
     }
 
