@@ -73,9 +73,9 @@ public class ApartmentSelectPanel extends BackgroundPanel {
 
         add(buildCard(660, "HIGH-END", "Comfort has a price", new String[][] {
                 {"+", "Stress builds up more slowly"},
+                {" ", "(except at your part-time job)"},
                 {"-", "Much higher electricity bill"},
-                {" ", "(you'll only see it on Day 29)"},
-                {" ", ""}
+                {" ", "(you'll only see it on Day 29)"}
         }, highEndButton, ApartmentType.HIGH_END, onChosen));
 
         WoodButton backButton = new WoodButton("< BACK", null, WoodButton.TAN);

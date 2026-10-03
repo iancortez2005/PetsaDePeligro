@@ -25,7 +25,7 @@ Two packages plus one demo class:
 
 Persistence: saves, the leaderboard and settings live in `%APPDATA%\Petsa de Peligro` via `GameApp.dataFile()`, which copies old working-directory files once. `*.csv` and `settings.properties` in the project root are git-ignored test or leftover data.
 
-Settled design rules (do not re-litigate): 10 rainy days per month are drawn at game start (days 2-29) and saved. Academic Commission, Discount and Utang happen once a month, and the other events rotate least-used-first with no back-to-back repeats. Study keeps +5 Stress. Stress at 100% lasts until a walk or hangout. A paid laundromat adds no water. The Bed is available only after tonight's task. Closing the window mid-game asks Save & Exit / Exit / Keep playing. Phone event lines colour each effect separately (`PhoneOverlay.effectColor`).
+Settled design rules (do not re-litigate): 10 rainy days per month are drawn at game start (days 2-29) and saved. Academic Commission, Discount and Utang happen once a month, and the other events rotate least-used-first with no back-to-back repeats. Study keeps +5 Stress. High-End's x0.6 Stress perk does not apply to part-time shifts (`Attribute.applyFullDelta`), otherwise Overtime was nearly free there. Stress at 100% lasts until a walk or hangout. A paid laundromat adds no water. The Bed is available only after tonight's task. Closing the window mid-game asks Save & Exit / Exit / Keep playing. Phone event lines colour each effect separately (`PhoneOverlay.effectColor`).
 
 ## Branches and comments
 

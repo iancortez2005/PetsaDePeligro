@@ -26,11 +26,12 @@ public class GameState {
     /**
      * The two apartments, chosen before Day 1. Electricity is a fixed rate
      * charged (and first revealed) on Day 29; the stress multiplier scales
-     * every Stress increase for the whole month.
+     * every Stress increase for the whole month, except part-time shifts
+     * (see PartTimeJob.ShiftType.work).
      */
     public enum ApartmentType {
         STANDARD(300, 1.0),
-        HIGH_END(700, 0.6); // Stress climbs 40% slower, but electricity costs P400 more
+        HIGH_END(700, 0.6); // Stress climbs 40% slower (not at work), but electricity costs P400 more
 
         private final int fixedElectricity;
         private final double stressGainMultiplier;
@@ -182,7 +183,8 @@ public class GameState {
 
     /**
      * Sets the apartment and applies its effect on Stress: every later
-     * Stress increase is scaled by the apartment's stress-gain multiplier
+     * Stress increase (except from a part-time shift) is scaled by the
+     * apartment's stress-gain multiplier
      * (1.0 for Standard, lower for High-End). Its electricity rate is
      * charged on Day 29 (see applyEndOfMonthBills).
      */

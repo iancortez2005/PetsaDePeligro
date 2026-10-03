@@ -43,10 +43,14 @@ public final class PartTimeJob {
             return stressCost;
         }
 
-        /** Works one shift: pays the earnings and adds the Stress. */
+        /**
+         * Works one shift: pays the earnings and adds the Stress at full
+         * strength, in either apartment (the High-End stress perk doesn't
+         * cover work, or Overtime would be nearly free there).
+         */
         public void work(Player player) {
             player.applyCashDelta(earnings);
-            player.getStress().applyDelta(stressCost);
+            player.getStress().applyFullDelta(stressCost);
         }
     }
 }

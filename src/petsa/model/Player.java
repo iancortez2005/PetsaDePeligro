@@ -158,9 +158,19 @@ public class Player {
         }
 
         /**
-         * Scales every INCREASE to this attribute (decreases are untouched).
-         * The High-End apartment uses this so Stress builds up more slowly:
-         * 0.6 turns a +40 shift into +24.
+         * Applies a change at full strength, skipping the gain multiplier.
+         * Part-time shifts use this: the High-End apartment's comfort doesn't
+         * make work any less stressful.
+         */
+        public void applyFullDelta(int delta) {
+            value = clamp(value + delta);
+        }
+
+        /**
+         * Scales every INCREASE to this attribute (decreases are untouched),
+         * except the ones made through applyFullDelta(). The High-End apartment
+         * uses this so Stress builds up more slowly: 0.6 turns a +25 guilt
+         * event into +15.
          */
         public void setGainMultiplier(double gainMultiplier) {
             this.gainMultiplier = gainMultiplier;
