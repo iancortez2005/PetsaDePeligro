@@ -16,8 +16,10 @@ import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -146,7 +148,7 @@ public final class GameDialog {
 
         dialog.setContentPane(panel);
         dialog.setSize(width, height);
-        dialog.setLocationRelativeTo(owner);
+        placeOver(dialog, owner);
         WoodButton focus = first;
         SwingUtilities.invokeLater(() -> {
             if (field != null) {
@@ -157,6 +159,22 @@ public final class GameDialog {
         });
         dialog.setVisible(true);
         return result[0];
+    }
+
+    private static void placeOver(JDialog dialog, Window owner) {
+        if (owner == null || !owner.isShowing()) {
+            dialog.setLocationRelativeTo(null);
+            return;
+        }
+        if (owner instanceof Frame) {
+            Frame frame = (Frame) owner;
+            if ((frame.getExtendedState() & Frame.ICONIFIED) != 0) {
+                frame.setExtendedState(frame.getExtendedState() & ~Frame.ICONIFIED);
+            }
+        }
+        Rectangle area = owner.getBounds();
+        dialog.setLocation(area.x + (area.width - dialog.getWidth()) / 2,
+                area.y + (area.height - dialog.getHeight()) / 2);
     }
 
     private static class DialogPanel extends JPanel {

@@ -275,7 +275,7 @@ public class PhoneOverlay extends JPanel {
         int days = engine.getDaysUntilRent();
         String when = days == 1
                 ? "Rent is due TOMORROW (Day " + GameState.RENT_DUE_DAY + ")!"
-                : "Rent is due on Day " + GameState.RENT_DUE_DAY + " - " + days + " days from now.";
+                : "Rent is due on Day " + GameState.RENT_DUE_DAY + ", that is " + days + " days from now.";
         return when + " The landlord collects " + PixelKit.peso(GameState.RENT_AMOUNT)
                 + " rent plus the electricity and water bills, and on Day " + GameState.TRANSPORT_DUE_DAY
                 + " you'll need " + PixelKit.peso(GameState.TRANSPORT_AMOUNT) + " for the ride home. Budget for it!";
