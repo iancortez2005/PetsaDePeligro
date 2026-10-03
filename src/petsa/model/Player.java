@@ -121,6 +121,10 @@ public class Player {
             value = clamp(value + delta);
         }
 
+        public void applyFullDelta(int delta) {
+            value = clamp(value + delta);
+        }
+
         public void setGainMultiplier(double gainMultiplier) {
             this.gainMultiplier = gainMultiplier;
         }

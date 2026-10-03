@@ -36,7 +36,7 @@ public final class PartTimeJob {
 
         public void work(Player player) {
             player.applyCashDelta(earnings);
-            player.getStress().applyDelta(stressCost);
+            player.getStress().applyFullDelta(stressCost);
         }
     }
 }
