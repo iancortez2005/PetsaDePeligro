@@ -23,9 +23,9 @@ import java.util.Random;
  * The view out of the window, shown over the room. What you see depends
  * on the time of day and the weather - four states:
  *
- *   MORNING   - a sunrise over the city
- *   MIDDAY    - a bright, high sun
- *   NIGHT     - a moon, stars and lit-up windows
+ *   MORNING   - a sunrise over the city, with clouds drifting by
+ *   MIDDAY    - a bright, high sun, with clouds drifting by
+ *   NIGHT     - a moon, stars and lit-up windows that blink on and off
  *   RAINY     - grey clouds and falling rain (Morning or Mid-day in the rain)
  *
  * A paper note under the window says what the weather means for the
@@ -52,6 +52,9 @@ public class WindowOverlay extends JPanel {
     private static final Rectangle NOTE = new Rectangle(345, 519, 591, 105);
     private static final Rectangle BACK_BUTTON = new Rectangle(540, 639, 198, 48);
     private static final int RAIN_TICK_MS = 70;
+    private static final int CLOUD_TICK_MS = 150;  // the clouds move one pixel-art block (SCALE px) per tick
+    private static final int LIGHTS_TICK_MS = 250;
+    private static final int CLOUD_WIDTH = 159;    // the widest a cloud from paintCloud() gets
 
     private static final Color VEIL = new Color(0, 0, 0, 150);
     private static final Color WOOD = new Color(0x8C, 0x6A, 0x48);
@@ -60,9 +63,11 @@ public class WindowOverlay extends JPanel {
     private static final Color INK = new Color(0x2E, 0x24, 0x1C);
 
     private final Runnable onClose;
-    private final Timer rainTimer;
+    private final Timer animationTimer;
     private View view = View.MORNING;
     private int rainOffset = 0;
+    private int cloudOffset = 0;       // how far the sunny clouds have drifted to the right
+    private long viewShownAt;          // when the current view appeared; the night lights blink from here
 
     public WindowOverlay(Runnable onClose) {
         this.onClose = onClose;
@@ -80,9 +85,14 @@ public class WindowOverlay extends JPanel {
         back.addActionListener(e -> onClose.run());
         add(back);
 
-        // Moves the rain a little every tick; only runs while the rainy view is showing.
-        rainTimer = new Timer(RAIN_TICK_MS, e -> {
-            rainOffset = (rainOffset + 12) % 120;
+        // Every view is animated: the rain falls, the sunny clouds drift and the city lights blink.
+        // The tick speed is set per view in showView().
+        animationTimer = new Timer(RAIN_TICK_MS, e -> {
+            if (view == View.RAINY) {
+                rainOffset = (rainOffset + 12) % 120;
+            } else if (view != View.NIGHT) {
+                cloudOffset = (cloudOffset + PixelKit.SCALE) % (GLASS.width + CLOUD_WIDTH);
+            }
             repaint(GLASS);
         });
     }
@@ -98,25 +108,33 @@ public class WindowOverlay extends JPanel {
         return slot == TimeSlot.AFTERNOON ? View.MIDDAY : View.MORNING;
     }
 
-    /** Shows the given view (and starts the rain animation if it's raining). Call just before showing. */
+    /** Shows the given view and starts its animation. Call just before showing. */
     public void showView(View newView) {
         view = newView;
-        if (view == View.RAINY) {
-            rainTimer.start();
-        } else {
-            rainTimer.stop();
+        viewShownAt = System.currentTimeMillis();
+        switch (view) {
+            case RAINY:
+                animationTimer.setDelay(RAIN_TICK_MS);
+                break;
+            case NIGHT:
+                animationTimer.setDelay(LIGHTS_TICK_MS);
+                break;
+            default:
+                animationTimer.setDelay(CLOUD_TICK_MS);
+                break;
         }
+        animationTimer.restart();
         repaint();
     }
 
-    /** Stops the rain animation. Call when the overlay is taken off screen. */
+    /** Stops the animation. Call when the overlay is taken off screen. */
     public void stopAnimation() {
-        rainTimer.stop();
+        animationTimer.stop();
     }
 
     @Override
     public void removeNotify() {
-        rainTimer.stop();
+        animationTimer.stop();
         super.removeNotify();
     }
 
@@ -232,8 +250,8 @@ public class WindowOverlay extends JPanel {
             case MIDDAY:
                 pg.setColor(new Color(0xFF, 0xF4, 0xC8));
                 pg.fillOval(g.x + g.width - 165, g.y + 36, 75, 75);
-                paintCloud(pg, g.x + 60, g.y + 75, new Color(0xFC, 0xE6, 0xBC));
-                paintCloud(pg, g.x + 270, g.y + 135, new Color(0xFC, 0xE6, 0xBC));
+                paintCloud(pg, driftingX(60), g.y + 75, new Color(0xFC, 0xE6, 0xBC));
+                paintCloud(pg, driftingX(270), g.y + 135, new Color(0xFC, 0xE6, 0xBC));
                 break;
             case RAINY:
                 paintCloud(pg, g.x + 30, g.y + 30, new Color(0x6E, 0x76, 0x80));
@@ -243,7 +261,8 @@ public class WindowOverlay extends JPanel {
             default:
                 pg.setColor(new Color(0xF4, 0xA8, 0x48));
                 pg.fillOval(g.x + 90, g.y + g.height - 195, 90, 90);          // low morning sun
-                paintCloud(pg, g.x + 300, g.y + 60, new Color(0xFF, 0xF2, 0xE2));
+                paintCloud(pg, driftingX(300), g.y + 60, new Color(0xFF, 0xF2, 0xE2));
+                paintCloud(pg, driftingX(-30), g.y + 150, new Color(0xFF, 0xF2, 0xE2));
                 break;
         }
 
@@ -265,6 +284,17 @@ public class WindowOverlay extends JPanel {
             pg.fillRect(g.x + 60 + i * 9, g.y + 30 + i * 18, 24, 18);
         }
         pg.setClip(oldClip);
+    }
+
+    /**
+     * Where a sunny cloud that started at startX (measured from the glass's left
+     * edge) is now. Clouds drift to the right; one that leaves the right edge
+     * comes back in from the left.
+     */
+    private int driftingX(int startX) {
+        int track = GLASS.width + CLOUD_WIDTH;
+        int x = ((startX + CLOUD_WIDTH + cloudOffset) % track + track) % track;
+        return GLASS.x - CLOUD_WIDTH + x;
     }
 
     private void paintCloud(Graphics2D pg, int x, int y, Color color) {
@@ -292,6 +322,10 @@ public class WindowOverlay extends JPanel {
                 building = new Color(0x4A, 0x5C, 0x70);
                 break;
         }
+        // Night lights: most lit windows blink, each on its own 3-4 second rhythm; the rest stay on.
+        // A separate fixed seed keeps the blinking from changing the buildings' sizes.
+        Random blinking = new Random(13);
+        long elapsed = System.currentTimeMillis() - viewShownAt;
         int x = g.x;
         while (x < g.x + g.width) {
             int w = 45 + seeded.nextInt(5) * 12;
@@ -302,7 +336,7 @@ public class WindowOverlay extends JPanel {
             if (view == View.NIGHT) {
                 for (int wy = top + 12; wy < g.y + g.height - 12; wy += 21) {
                     for (int wx = x + 9; wx < x + w - 9; wx += 15) {
-                        if (seeded.nextInt(3) == 0) {
+                        if (seeded.nextInt(3) == 0 && isLightOn(blinking, elapsed)) {
                             pg.setColor(new Color(0xF2, 0xD0, 0x6A));
                             pg.fillRect(wx, wy, 6, 9);
                         }
@@ -311,6 +345,18 @@ public class WindowOverlay extends JPanel {
             }
             x += w + 3;
         }
+    }
+
+    /**
+     * Whether one lit window's light is on right now. About three in four
+     * windows blink: on for 3-4 seconds, off for as long, and so on, each
+     * with its own timing so they don't all switch together.
+     */
+    private static boolean isLightOn(Random blinking, long elapsed) {
+        boolean blinks = blinking.nextInt(4) != 0;
+        int interval = 3000 + blinking.nextInt(1001);
+        int start = blinking.nextInt(interval * 2);
+        return !blinks || ((elapsed + start) / interval) % 2 == 0;
     }
 
     private void paintFrameAndNote(Graphics2D pg) {

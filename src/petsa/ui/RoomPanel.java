@@ -25,6 +25,7 @@ import petsa.ui.PixelKit.WoodButton;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -110,8 +111,10 @@ public class RoomPanel extends BackgroundPanel {
     private static final Rectangle DAY_CASH_BOX = new Rectangle(20, 15, 260, 80);
     private static final Rectangle TIME_BAR = new Rectangle(340, 22, 520, 50);
     private static final Rectangle ATTRIBUTE_BOX = new Rectangle(890, 15, 285, 80);
+    private static final Rectangle PAUSE_BUTTON = new Rectangle(1185, 28, 82, 42);
     /** The Board sign plus the corkboard in the background art, highlighted together by the tutorial. */
     private static final Rectangle BOARD_AREA = new Rectangle(540, 108, 294, 258);
+    private static final Color TIP_BACKING = new Color(0, 0, 0, 160);
 
     /** File names tried for the phone sprite (any of these, with any of the extensions below). */
     private static final String[] PHONE_SPRITE_NAMES = {"phone_sprite", "phone", "Phone", "Phone_Sprite", "PhoneSprite"};
@@ -307,7 +310,7 @@ public class RoomPanel extends BackgroundPanel {
         add(attributeBox);
 
         WoodButton pauseButton = new WoodButton("PAUSE", null, WoodButton.DARK_WOOD);
-        pauseButton.setBounds(1185, 28, 82, 42);
+        pauseButton.setBounds(PAUSE_BUTTON);
         pauseButton.addActionListener(e -> FadePane.run(this, this::showPause));
         makeClickable(pauseButton);
         add(pauseButton);
@@ -336,10 +339,20 @@ public class RoomPanel extends BackgroundPanel {
             add(phoneSprite);
         }
 
-        JLabel tip = new JLabel("Tip: Use the Board or Door for each part of the day, then sleep at Night. Don't skip a part-time job.");
+        // The tip sits on a see-through black strip, like a video caption, so it stays readable on any background.
+        JLabel tip = new JLabel("Tip: Use the Board or Door for each part of the day, then sleep at Night. Don't skip a part-time job.") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.setColor(TIP_BACKING);
+                g.fillRect(0, 0, getWidth(), getHeight());
+                super.paintComponent(g);
+            }
+        };
         tip.setFont(PixelKit.font(9f));
         tip.setForeground(new Color(0xF2, 0xD8, 0x8A));
-        tip.setBounds(20, HEIGHT - 30, 900, 22);
+        tip.setBorder(BorderFactory.createEmptyBorder(3, 9, 3, 9));
+        Dimension tipSize = tip.getPreferredSize();
+        tip.setBounds(11, HEIGHT - 19 - tipSize.height / 2, tipSize.width, tipSize.height);
         add(tip);
     }
 
@@ -917,7 +930,7 @@ public class RoomPanel extends BackgroundPanel {
                 "Working with Stress at 100% is a bad idea - you might get pickpocketed on the way home."));
 
         pages.add(new TutorialOverlay.Page("PHONE, SHELF AND BED", TutorialOverlay.BoxPlacement.BOTTOM_LEFT,
-                new Rectangle[] {PHONE_SPRITE.union(PHONE_SIGN), SHELF_SIGN, BED_SIGN},
+                new Rectangle[] {PHONE_SPRITE.union(PHONE_SIGN), SHELF_SIGN, BED_SIGN, PAUSE_BUTTON},
                 "PHONE: Mail brings surprise events - when it says",
                 "'1 new mail!', read it before doing anything else.",
                 "Shopping sells medicine and bulk food.",

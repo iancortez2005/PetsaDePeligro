@@ -16,8 +16,10 @@ import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -181,7 +183,7 @@ public final class GameDialog {
 
         dialog.setContentPane(panel);
         dialog.setSize(width, height);
-        dialog.setLocationRelativeTo(owner);
+        placeOver(dialog, owner);
         WoodButton focus = first;
         SwingUtilities.invokeLater(() -> {
             if (field != null) {
@@ -192,6 +194,29 @@ public final class GameDialog {
         });
         dialog.setVisible(true); // blocks until a button is pressed or Esc
         return result[0];
+    }
+
+    /**
+     * Centers the dialog over its window. A minimized window (e.g. closed from
+     * its taskbar preview) is restored first, so the question appears over the
+     * game. The window's own bounds are used instead of setLocationRelativeTo,
+     * which reads a minimized window's off-screen position (-25600, -25600 on
+     * Windows) and pushes the dialog into the screen's top-left corner.
+     */
+    private static void placeOver(JDialog dialog, Window owner) {
+        if (owner == null || !owner.isShowing()) {
+            dialog.setLocationRelativeTo(null);
+            return;
+        }
+        if (owner instanceof Frame) {
+            Frame frame = (Frame) owner;
+            if ((frame.getExtendedState() & Frame.ICONIFIED) != 0) {
+                frame.setExtendedState(frame.getExtendedState() & ~Frame.ICONIFIED);
+            }
+        }
+        Rectangle area = owner.getBounds();
+        dialog.setLocation(area.x + (area.width - dialog.getWidth()) / 2,
+                area.y + (area.height - dialog.getHeight()) / 2);
     }
 
     /** Paints the frame, title bar and paper; the message is drawn straight onto the paper. */
