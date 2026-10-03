@@ -271,7 +271,7 @@ public class RoomPanel extends BackgroundPanel {
             add(phoneSprite);
         }
 
-        JLabel tip = new JLabel("Tip: Use the Board or Door for each part of the day, then sleep at Night.");
+        JLabel tip = new JLabel("Tip: Use the Board or Door for each part of the day, then sleep at Night. Don't skip a part-time job.");
         tip.setFont(PixelKit.font(9f));
         tip.setForeground(new Color(0xF2, 0xD8, 0x8A));
         tip.setBounds(20, HEIGHT - 30, 900, 22);
