@@ -12,7 +12,7 @@ rem one that comes with NetBeans unless JDK is set to another) and, for the
 rem installer only, WiX Toolset 3.14 (without it, just the zip is made).
 
 setlocal
-set VERSION=1.0.0
+set VERSION=1.1.0
 set APP_NAME=Petsa de Peligro
 rem Never change this: it's how Windows knows a new version's installer
 rem should replace the old one instead of installing a second copy.
